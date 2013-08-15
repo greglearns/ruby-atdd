@@ -44,10 +44,10 @@ module RubyAtdd
           multiline_text = extract_multiline_text(ii)
           execute_line(line, multiline_text)
         end
-      rescue MiniTest::Assertion => e
-        puts "FAIL: #{e.message} #{'-'*30}"
-        response_code = 1
-      rescue => e
+      # rescue MiniTest::Assertion => e
+      #   puts "FAIL: #{e.message} #{'-'*30}"
+      #   response_code = 1
+      rescue Exception => e # must rescue Exception because Minitest::Assertion subclasses Exception
         puts "#{'-'*10} FAIL: #{e.message}", e.backtrace
         response_code = 1
       end
