@@ -1,5 +1,3 @@
-module Ruby
-  module Atdd
-    VERSION = "0.0.1"
-  end
+module RubyAtdd
+  VERSION = "0.0.1"
 end
