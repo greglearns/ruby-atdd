@@ -1,11 +1,8 @@
 require_relative 'source_code_matcher_extractor'
-require 'minitest'
-require 'pry'
 
 module RubyAtdd
 
   class Base
-    include ::Minitest::Assertions
 
     def self.scenarios(attrs)
       file_name = attrs.fetch(:file_name, nil)

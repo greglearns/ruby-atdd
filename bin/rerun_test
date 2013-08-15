@@ -1,3 +1,2 @@
 #!/bin/sh
 exec rerun -c -b -x -- bundle exec ruby $1
-# exec bundle exec rerun -c -b -x -- bundle exec ruby $1
