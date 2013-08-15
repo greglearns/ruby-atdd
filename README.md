@@ -1,4 +1,4 @@
-# Ruby::Atdd
+# Ruby-Atdd
 
 TL;DR: Like Cucumber, but with less features, but also easier to use, and you can use it for stress testing.
 
@@ -26,7 +26,11 @@ Or install it yourself as:
 
 ## Usage
 
-### During development
+### Writing Acceptance Tests
+
+
+
+### Running During development
 
 ```bash
 rerun_test path/to/your/acceptance/test.rb
@@ -38,8 +42,8 @@ If you don't know why this is valuable, read http://www.growing-object-oriented-
 
 ## Roadmap
 
-[] Add tests (yes, I usually write tests first.)
-[] Use for load testing, making improvements as needed.
+- [ ] Add tests (yes, I usually write tests first.)
+- [ ] Use for load testing, making improvements as needed.
 
 ## Contributing
 

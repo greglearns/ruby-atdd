@@ -1,7 +1,5 @@
 require "ruby-atdd/version"
+require 'base'
 
-module Ruby
-  module Atdd
-    # Your code goes here...
-  end
+module RubyAtdd
 end
