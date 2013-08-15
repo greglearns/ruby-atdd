@@ -48,7 +48,8 @@ module RubyAtdd
       #   puts "FAIL: #{e.message} #{'-'*30}"
       #   response_code = 1
       rescue Exception => e # must rescue Exception because Minitest::Assertion subclasses Exception
-        puts "#{'-'*10} FAIL: #{e.message}", e.backtrace
+        puts "FAIL: #{e.message}"
+        puts e.backtrace unless e.class.to_s == 'Minitest::Assertion'
         response_code = 1
       end
       puts
