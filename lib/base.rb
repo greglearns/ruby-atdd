@@ -127,7 +127,7 @@ module RubyAtdd
     def each_line(&block)
       ii = @str.each_line
       loop do
-        line = CleanLine.new(ii.next).strip
+        line = CleanLine.new(ii.next).strip!
         next if line.skip?
         print line
         line.skip_first_word!
@@ -159,8 +159,8 @@ module RubyAtdd
       @line = String(line)
     end
 
-    def strip
-      @line.strip
+    def strip!
+      @line.strip!
       self
     end
 
