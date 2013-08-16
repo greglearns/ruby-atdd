@@ -16,6 +16,23 @@ module RubyAtdd
       exit(failing_tests_count)
     end
 
+    def scenario(str)
+      response_code = 0
+      begin
+        ScenarioParser.new(str).each_line do |line, multiline_text|
+          execute_line(line.to_s, multiline_text)
+        end
+      rescue Exception => e # must rescue Exception because Minitest::Assertion subclasses Exception
+        puts "FAIL: #{e.message}"
+        puts e.backtrace unless e.class.to_s == 'Minitest::Assertion'
+        response_code = 1
+      end
+      puts
+      response_code
+    end
+
+    private
+
     def self.handle_multiple_scenarios(str)
       failures = ScenariosParser.new(str).map do |scenario_str|
         subject = new({uri_base: ENV['BASE_URL']})
@@ -42,21 +59,6 @@ module RubyAtdd
       str
     end
 
-    def scenario(str)
-      response_code = 0
-      begin
-        ScenarioParser.new(str).each_line do |line, multiline_text|
-          execute_line(line.to_s, multiline_text)
-        end
-      rescue Exception => e # must rescue Exception because Minitest::Assertion subclasses Exception
-        puts "FAIL: #{e.message}"
-        puts e.backtrace unless e.class.to_s == 'Minitest::Assertion'
-        response_code = 1
-      end
-      puts
-      response_code
-    end
-
     def self.method_added(name)
       extractor = SourceCodeMatcherExtractor.new(called_by(caller).to_h)
       matcher_lines = extractor.extract
@@ -74,7 +76,16 @@ module RubyAtdd
       @matchers
     end
 
-    private
+    def self.find_matcher(line)
+      match = nil
+      matchers.each do |list|
+        actual_match = list[1].find do |matcher|
+          matcher.match(line)
+        end
+        (match = [list[0], actual_match]; break) if actual_match
+      end
+      match
+    end
 
     def execute_line(line, multiline_text)
       method, matcher = self.class.find_matcher(line)
@@ -87,17 +98,6 @@ module RubyAtdd
         puts " (no match)"
       end
       puts multiline_text if multiline_text
-    end
-
-    def self.find_matcher(line)
-      match = nil
-      matchers.each do |list|
-        actual_match = list[1].find do |matcher|
-          matcher.match(line)
-        end
-        (match = [list[0], actual_match]; break) if actual_match
-      end
-      match
     end
 
   end
