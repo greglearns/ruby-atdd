@@ -89,15 +89,17 @@ module RubyAtdd
 
     def execute_line(line, multiline_text)
       method, matcher = self.class.find_matcher(line)
+      open, close = '"', '"'
       if method && matcher
         puts
         args = matcher.match(line).captures
         args << multiline_text if multiline_text
+        puts open*3, multiline_text, close*3 if multiline_text
         self.send(method, *args)
       else
         puts " (no match)"
+        puts open*3, multiline_text, close*3 if multiline_text
       end
-      puts multiline_text if multiline_text
     end
 
   end
