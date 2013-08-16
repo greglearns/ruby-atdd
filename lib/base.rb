@@ -19,10 +19,12 @@ module RubyAtdd
       else
         str = attrs.fetch(:str)
       end
+
       scenarios = str.split("\n\n").compact.map{|e| e.strip.empty? ? nil : e }.compact
 
       results = scenarios.map do |scenario_str|
-        subject.scenario scenario_str
+        subject.scenario(scenario_str)
+        .tap{|r| puts } # blank line between scenario results
       end
 
       failing_tests_count = results.reduce(:+)
@@ -35,14 +37,12 @@ module RubyAtdd
       begin
         ii = str.each_line
         loop do
-          line = ii.next
-          line.strip!
-          next if line.empty?
-          next if line =~ /\A\w*#/ # skip comments
+          line = CleanLine.new(ii.next).strip
+          next if line.skip?
           print line
-          line = line.split(' ',2)[1].strip
+          line.skip_first_word!
           multiline_text = extract_multiline_text(ii)
-          execute_line(line, multiline_text)
+          execute_line(line.to_s, multiline_text)
         end
       # rescue MiniTest::Assertion => e
       #   puts "FAIL: #{e.message} #{'-'*30}"
@@ -57,17 +57,17 @@ module RubyAtdd
     end
 
     def extract_multiline_text(ii)
-      return unless ii.peek =~ /"""/
-      ii.next # eat line with """
+      return unless CleanLine.new(ii.peek).is_fence?
+      indent = CleanLine.new(ii.next).compute_indent_size
       lines = []
       loop do
-        line = ii.next
-        break if line =~ /"""/
-        lines << line
+        line = CleanLine.new(ii.next)
+        break if line.is_fence?
+        line.remove_indent!(indent)
+        lines << line.to_s
       end
       str = lines.join
       str.empty? ? nil : str
-
     end
 
     def self.method_added(name)
@@ -93,7 +93,7 @@ module RubyAtdd
         puts
         args = matcher.match(line).captures
         args << multiline_text if multiline_text
-        self.send(method, *matcher.match(line).captures)
+        self.send(method, *args)
       else
         puts " (no match)"
       end
@@ -112,5 +112,43 @@ module RubyAtdd
     end
 
   end
+
+  class CleanLine
+    def initialize(line)
+      @line = String(line)
+    end
+
+    def strip
+      @line.strip
+      self
+    end
+
+    def skip?
+      @line.empty? || @line =~ /\A\w*#/ # skip comments
+    end
+
+    def skip_first_word!
+      @line = @line.split(' ',2)[1].strip
+      self
+    end
+
+    def is_fence?
+      @line =~ /"""/
+    end
+
+    def compute_indent_size
+      @line.match(/\A\s*/)[0].size rescue 0
+    end
+
+    def remove_indent!(indent)
+      @line.sub!(/\A {0,#{indent}}/,'')
+        self
+    end
+
+    def to_s
+      @line
+    end
+  end
+
 end
 
