@@ -9,18 +9,22 @@ module RubyAtdd
     def self.scenarios(attrs)
       load_dot_env
       called_by = called_by(caller)
-      subject = Atdd::CreateServer.new({uri_base: ENV['BASE_URL']})
 
       puts '', '-'*30, "TEST RUN STARTED", File.basename(called_by.file), "#{called_by.file}", "URL_BASE=#{ENV['BASE_URL']}", Time.now.to_s, '-'*30, ''
 
-      results = ScenariosParser.new(get_scenarios_str(attrs)).map do |scenario_str|
+      failing_tests_count = handle_multiple_scenarios(get_scenarios_str(attrs))
+      exit(failing_tests_count)
+    end
+
+    def self.handle_multiple_scenarios(str)
+      failures = ScenariosParser.new(str).map do |scenario_str|
+        subject = new({uri_base: ENV['BASE_URL']})
         subject.scenario(scenario_str)
         .tap{|r| puts } # blank line between scenario results
       end
 
-      failing_tests_count = results.reduce(:+)
-      .tap{|cnt| puts "#{cnt} tests failed." }
-      exit(failing_tests_count)
+      failures.reduce(:+)
+      .tap{|cnt| puts "#{failures.size} scenarios. #{cnt} tests failed." }
     end
 
     def self.load_dot_env

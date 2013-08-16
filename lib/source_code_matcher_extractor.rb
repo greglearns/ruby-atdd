@@ -1,7 +1,7 @@
 module RubyAtdd
   class SourceCodeMatcherExtractor
     def initialize(params)
-      @file_name = params.fetch(:file_name)
+      @file_name = params.fetch(:file)
       @method_line = params.fetch(:line).to_i
       @match = /# english: ?(.*)/i
     end
