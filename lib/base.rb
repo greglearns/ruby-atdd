@@ -46,7 +46,7 @@ module RubyAtdd
 
       failing_test_cnt = results.map{|r| r[:response_code] }.reduce(:+)
       pending_test_cnt = results.map{|r| r[:line_results].compact.size }.delete_if{|r| r > 0 }.size
-      puts "#{results.size} scenarios. #{failing_test_cnt} scenarios failed. #{pending_test_cnt} pending scenarios."
+      puts "#{failing_test_cnt} failed scenarios. #{pending_test_cnt} pending scenarios. #{results.size} total scenarios."
       failing_test_cnt
     end
 
