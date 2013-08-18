@@ -16,6 +16,9 @@ module RubyAtdd
       exit(failing_tests_count)
     end
 
+    def initialize(*args)
+    end
+
     def scenario(str)
       response_code = 0
       begin
@@ -141,7 +144,7 @@ module RubyAtdd
     private
 
     def extract_multiline_text(ii)
-      return unless CleanLine.new(ii.peek).is_fence?
+      return unless (CleanLine.new(ii.peek).is_fence? rescue false)
       indent = CleanLine.new(ii.next).compute_indent_size
       lines = []
       loop do
@@ -171,7 +174,7 @@ module RubyAtdd
     end
 
     def skip_first_word!
-      @line = @line.split(' ',2)[1].strip
+      @line = @line.split(/[ :]/,2)[1].strip rescue ''
       self
     end
 
