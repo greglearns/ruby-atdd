@@ -21,9 +21,10 @@ module RubyAtdd
 
     def scenario(str)
       response_code = 0
+      line_results = []
       begin
         ScenarioParser.new(str).each_line do |line, multiline_text|
-          execute_line(line.to_s, multiline_text)
+          line_results << execute_line(line.to_s, multiline_text)
         end
       rescue Exception => e # must rescue Exception because Minitest::Assertion subclasses Exception
         puts "FAIL: #{e.message}"
@@ -31,20 +32,22 @@ module RubyAtdd
         response_code = 1
       end
       puts
-      response_code
+      {response_code: response_code, line_results: line_results}
     end
 
     private
 
     def self.handle_multiple_scenarios(str)
-      failures = ScenariosParser.new(str).map do |scenario_str|
+      results = ScenariosParser.new(str).map do |scenario_str|
         subject = new({uri_base: ENV['BASE_URL']})
         subject.scenario(scenario_str)
         .tap{|r| puts } # blank line between scenario results
       end
 
-      failures.reduce(:+)
-      .tap{|cnt| puts "#{failures.size} scenarios. #{cnt} tests failed." }
+      failing_test_cnt = results.map{|r| r[:response_code] }.reduce(:+)
+      pending_test_cnt = results.map{|r| r[:line_results].compact.size }.delete_if{|r| r > 0 }.size
+      puts "#{results.size} scenarios. #{failing_test_cnt} scenarios failed. #{pending_test_cnt} pending scenarios."
+      failing_test_cnt
     end
 
     def self.load_dot_env
@@ -99,9 +102,11 @@ module RubyAtdd
         args << multiline_text if multiline_text
         puts open*3, multiline_text, close*3 if multiline_text
         self.send(method, *args)
+        :tested
       else
         puts " (no match)"
         puts open*3, multiline_text, close*3 if multiline_text
+        nil
       end
     end
 
