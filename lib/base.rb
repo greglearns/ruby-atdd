@@ -55,9 +55,9 @@ module RubyAtdd
     end
 
     def self.get_scenarios_str(attrs)
-      file_name = attrs.fetch(:file_name, nil)
-      if file_name
-        str = File.read(file_name)
+      file = attrs.fetch(:file, nil)
+      if file
+        str = File.read(file)
         str = str.split("__END__")[1]
       else
         str = attrs.fetch(:str)
@@ -79,7 +79,7 @@ module RubyAtdd
     end
 
     def self.matchers
-      @matchers
+      @matchers ||= []
     end
 
     def self.find_matcher(line)
