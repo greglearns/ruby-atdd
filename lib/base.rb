@@ -29,6 +29,7 @@ module RubyAtdd
       rescue Exception => e # must rescue Exception because Minitest::Assertion subclasses Exception
         puts "FAIL: #{e.message}"
         puts e.backtrace unless e.class.to_s == 'Minitest::Assertion'
+        exit(false) if e.message == 'DIE NOW'
         response_code = 1
       end
       puts
